@@ -1,135 +1,126 @@
 <template>
-    <q-layout view="hhh LpR fFf">
+    <div class="q-md">
+      <q-layout view="hHh Lpr lff" container class="shadow-2 rounded-borders"></q-layout>
+        <q-header elevated class="header" v-show="$route.path !== '/' && $route.path !== '/'">
+          <q-toolbar>
+            <q-btn flat @click="drawer = !drawer" round dense icon="menu" v-if="userName"/>
+            <q-toolbar-title>Factus</q-toolbar-title>
+            
+            <q-btn-dropdown  id="dropdown" :label="userName" class="q-py-sm" style="color: white; ">
+                
+                    <q-list  >
+                     
+                        <q-item clickable v-close-popup @click="goToSettings">
+                            <q-item-section avatar>
+                                <q-icon name="settings" />
+                            </q-item-section>
+                            <q-item-section>Configuración</q-item-section>
+                        </q-item>
 
-        <q-header id="header-main" v-show="$route.name !== 'Login' && $route.name !== '/'">
-            <q-toolbar>
-
-                <q-btn dense flat round icon="menu" @click="toggleLeftDrawer" v-show="$route.name !== 'inicio'" />
-                <q-toolbar-title class="text-left"></q-toolbar-title>
-                <q-space />
-
-        
-                <q-btn dense flat round icon="logout" @click="logout" />
-            </q-toolbar>
+                        <q-item clickable v-close-popup @click="logout" to="/">
+                            <q-item-section avatar>
+                                <q-icon name="logout" style="color: gray;"  />
+                            </q-item-section>
+                            <q-item-section>Cerrar sesión</q-item-section>
+                        </q-item>
+                    </q-list>
+                </q-btn-dropdown>
+          </q-toolbar>
         </q-header>
+        
+  
+        <q-drawer
+        v-show="$route.path !== '/' && $route.path !== '/'"
+          v-model="drawer"
+          show-if-above
+          :mini="miniState"
+          @mouseenter="miniState = false"
+          @mouseleave="miniState = true"
+          mini-to-overlay
+          :width="200"
+          :breakpoint="500"
+          bordered
+          :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+        >
+          <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
+            <q-list padding>
+              <q-item clickable v-ripple to="/home">
+                <q-item-section avatar>
+                  <q-icon name="home" />
+                </q-item-section>
+  
+                <q-item-section>
+                  Inicio
+                </q-item-section>
+              </q-item>
+              <q-item clickable v-ripple to="/invoice">
+                <q-item-section avatar>
+                  <q-icon name="receipt"  />
+                </q-item-section>
+  
+                <q-item-section>
+                  Facturas
+                </q-item-section>
+              </q-item>
+  
+              <q-item active clickable v-ripple to="/customer">
+                <q-item-section avatar>
+                  <q-icon name="person" />
+                </q-item-section>
+  
+                <q-item-section>
+                  Clientes
+                </q-item-section>
+              </q-item>
+  
+              <q-item clickable v-ripple to="/product">
+                <q-item-section avatar>
+                  <q-icon name="send" />
+                </q-item-section>
+  
+                <q-item-section>
+                  Productos
+                </q-item-section>
+              </q-item>
+  
+              <q-separator />
 
-
-        <q-drawer v-model="leftDrawerOpen" side="left" behavior="mobile" bordered>
-
-            <q-img class="absolute-top" src="https://cdn.quasar.dev/img/material.png"
-                style="height: 150px; background-color: #1d1d1d">
-                <div class="absolute-bottom bg-transparent">
-                    <q-avatar size="56px" class="q-mb-sm">
-                        <img src="https://cdn.quasar.dev/img/boy-avatar.png">
-                    </q-avatar>
-                    <div class="text-weight-bold">Razvan Stoenescu</div>
-                    <div>@rstoenescu</div>
-                </div>
-            </q-img>
-
-            <q-scroll-area style="height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd">
-                <q-list padding>
-                    <q-item clickable v-ripple to="/inicio" active-class="my-menu-link" exact>
-                        <q-item-section avatar>
-                            <q-icon name="home" />
-                        </q-item-section>
-                        <q-item-section>Inicio</q-item-section>
-                    </q-item>
-
-                    
-
-                    <q-item clickable v-ripple to="/terceros/clientes" active-class="my-menu-link">
-                        <q-item-section avatar>
-                            <q-icon name="group" />
-                        </q-item-section>
-                        <q-item-section>Clientes</q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple to="/terceros/proveedores" active-class="my-menu-link">
-                        <q-item-section avatar>
-                            <q-icon name="groups" />
-                        </q-item-section>
-                        <q-item-section>Proveedores</q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple to="/entradas" active-class="my-menu-link">
-                        <q-item-section avatar>
-                            <q-icon name="input" />
-                        </q-item-section>
-                        <q-item-section>Entradas</q-item-section>
-                    </q-item>
-
-                    <q-item clickable v-ripple to="/salidas" active-class="my-menu-link">
-                        <q-item-section avatar>
-                            <q-icon name="output" />
-                        </q-item-section>
-                        <q-item-section>Salidas</q-item-section>
-                    </q-item>
-                </q-list>
-            </q-scroll-area>
+            </q-list>
+          </q-scroll-area>
         </q-drawer>
-
-
+  
         <q-page-container>
-            <router-view />
+          <router-view />
         </q-page-container>
 
-        <q-footer elevated class="bg-grey-8 text-white">
-            <q-toolbar>
-                <q-toolbar-title>
-                    <div class="text-footer">Copyright - 2025 © Todos los derechos reservados</div>
-                </q-toolbar-title>
-            </q-toolbar>
-        </q-footer>
-    </q-layout>
-</template>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { useAuth } from '../store/useAuth';
+import { QPageContainer } from 'quasar';
+  
+  const router = useRouter();
+  const auth = useAuth();
+  const drawer = ref(false);
+  const miniState = ref(true);
+  let userName = auth.userName
+  
+  </script>
+  <style>
+  .header{
+    background: rgb(0,220,230);
+    background: radial-gradient(circle, rgba(0,220,230,1) 0%, rgba(0,123,240,1) 50%);
+  }
 
-<script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+  #dropdown{
+    font-size: 10px;
+    font-weight: 700;
+   
+  }
 
+  
 
-const router = useRouter()
-
-
-const leftDrawerOpen = ref(false)
-
-
-function toggleLeftDrawer() {
-    leftDrawerOpen.value = !leftDrawerOpen.value
-}
-
-
-function logout() {
-    router.replace('/')
-}
-</script>
-
-<style scoped>
-#header-main {
-    background-color: rgb(2, 21, 38);
-    color: white;
-}
-
-.logo {
-    width: 50px;
-}
-
-.text-footer {
-    font-size: 12px;
-    color: rgb(255, 255, 255);
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.material-symbols-outlined {
-    font-size: 18px;
-    vertical-align: middle;
-}
-
-.my-menu-link {
-    color: white;
-    background-color: rgba(2, 21, 38, 0.37);
-}
 </style>
