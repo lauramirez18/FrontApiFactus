@@ -1,123 +1,97 @@
 <template>
-    <q-page padding>
-      <q-table
-        flat
-        bordered
-        title="Clientes"
-        :rows="clientes"
-        :columns="columns"
-        row-key="id"
-      >
-        <template v-slot:top>
-          <q-toolbar>
-            <q-toolbar-title>Lista de Clientes</q-toolbar-title>
-            <q-space />
-            <q-btn icon="download" label="Descargar" color="primary" />
-            <q-btn color="green" label="Crear / Importar" icon="add" @click="openDialog" />
-          <q-dialog
-      v-model="dialog"
-      persistent
-      :maximized="maximizedToggle"
-      transition-show="slide-up"
-      transition-hide="slide-down"
+  <h4>Clientes</h4>
+  <hr>
+  <div class="tittle">
+          <q-input v-model="search" placeholder="Buscar producto" outlined dense clearable >
+            <template v-slot:append>
+              <q-btn flat icon="search" @click="getDatafromAPI" />
+            </template>
+          </q-input>
+     
+      <div class="add">
+          <q-btn  label="Crear" icon="person_add" @click="openDialog"  class="crear" style="background-color: #007bff; color: white; border-radius: 6px; padding: 10px 20px; font-weight: 600;" />
+      </div>
+      </div>
+
+      <q-page padding>
+    <q-table
+      flat
+      bordered
+      title="Clientes"
+      :rows="clientes"
+      :columns="columns"
+      row-key="id"
     >
-      <q-card>
-        <q-bar>
-          <q-space />
+      <template v-slot:header="props">
+        <tr>
+          <th v-for="col in props.cols" :key="col.name" class="tabla-header">
+            <span>{{ col.label }}</span>
+          </th>
+        </tr>
+      </template>
 
-         
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip class="bg-white text-primary">Close</q-tooltip>
-          </q-btn>
-        </q-bar>
+      <template v-slot:top>
 
-        <q-card class="q-pa-md shadow-2">
-      <q-card-section>
-        <div class="text-h6 text-primary">Registrar Cliente</div>
-      </q-card-section>
+        <!-- Modal de Registro de Cliente -->
+        <q-dialog v-model="dialog" persistent transition-show="slide-up" transition-hide="slide-down">
+          <q-card class="q-pa-md shadow-3" style="max-width: 700px; width: 100%;">
+            <!-- Encabezado -->
+            <q-card-section class="bg-primary text-white row items-center justify-between">
+              <div class="text-h6">Registrar Cliente</div>
+              <q-btn dense flat icon="close" v-close-popup />
+            </q-card-section>
 
-     <q-form >
-      <q-select 
-      v-model="form.legal_organization_id"
-      :options="organizationTypes"
-      label="Tipo de organización"
-      option-value="id"
-      option-label="name"
-      emit-value
-      map-options
-      outlined
-      dense
-      @update:model-value="handleOrganizationChange"
-      required
-      />
-        <!-- Campos solo para Persona Jurídica -->
-    <q-input 
-      v-if="form.legal_organization_id === 1" 
-      v-model="form.company" 
-      label="Razón Social" 
-      required
-      outlined
-    />
-    <q-input 
-      v-if="form.legal_organization_id === 1" 
-      v-model="form.trade_name" 
-      label="Nombre Comercial" 
-      outlined
-    />
+            <q-card-section>
+              <q-form @submit.prevent="saveCustomer">
+                <!-- Tipo de Organización -->
+                <q-select 
+                  v-model="form.legal_organization_id"
+                  :options="organizationTypes"
+                  label="Tipo de organización"
+                  option-value="id"
+                  option-label="name"
+                  emit-value
+                  map-options
+                  outlined
+                  dense
+                  @update:model-value="handleOrganizationChange"
+                  class="full-width"
+                />
 
-       <!-- Campo solo para Persona Natural -->
-       <q-input 
-      v-if="form.legal_organization_id === 2" 
-      v-model="form.names" 
-      label="Nombre Completo" 
-      outlined
-    />
-      <!-- Campos generales (aplican para ambos) -->
-      <q-select
-  v-model="form.identification_document_id"
-  :options="documentTypeOptions"
-  label="Tipo de documento"
-  outlined
-  dense
-  emit-value
-  map-options
-/>
-      <q-input v-model="form.identification" label="Identificación" outlined />
-      
-      <q-select
-  v-model="form.tribute_id"
-  :options="tributeOptions"
-  label="Tributo"
-  outlined
-  dense
-  emit-value
-  map-options
-/>
-    <q-input v-model="form.address" label="Dirección" outlined />
-    <q-input v-model="form.email" label="Correo Electrónico" outlined type="email" />
-    <q-input v-model="form.phone" label="Teléfono" outlined type="tel" />
-        <!-- Municipio -->
-    <q-select
-  v-model="form.municipality_id"
-  :options="municipalityOptions"
-  label="Municipio"
-  outlined
-  dense
-  emit-value
-  map-options
-/>
+                <!-- Campos en 2 columnas -->
+                <div class="row q-col-gutter-md">
+                  <!-- Persona Jurídica -->
+                  <q-input v-if="form.legal_organization_id === 1" v-model="form.company" label="Razón Social" class="col-6" outlined dense />
+                  <q-input v-if="form.legal_organization_id === 1" v-model="form.trade_name" label="Nombre Comercial" class="col-6" outlined dense />
 
-<q-btn label="Guardar Cliente" @click="saveCustomer" type="submit" color="primary" class="q-mt-md" />
-</q-form>
+                  <!-- Persona Natural -->
+                  <q-input v-if="form.legal_organization_id === 2" v-model="form.names" label="Nombre Completo" class="col-12" outlined dense />
 
-</q-card>
-      </q-card>
-    </q-dialog>
-      
-          </q-toolbar>
-        </template>
-      </q-table>
-    </q-page>
+                  <!-- Información General -->
+                  <q-select v-model="form.identification_document_id" :options="documentTypeOptions" label="Tipo de documento" class="col-6" outlined dense emit-value map-options />
+                  <q-input v-model="form.identification" label="Identificación" class="col-6" outlined dense />
+
+                  <q-select v-model="form.tribute_id" :options="tributeOptions" label="Tributo" class="col-6" outlined dense emit-value map-options />
+                  <q-input v-model="form.address" label="Dirección" class="col-6" outlined dense />
+
+                  <q-input v-model="form.email" label="Correo Electrónico" type="email" class="col-6" outlined dense />
+                  <q-input v-model="form.phone" label="Teléfono" type="tel" class="col-6" outlined dense />
+
+                  <!-- Municipio -->
+                  <q-select v-model="form.municipality_id" :options="municipalityOptions" label="Municipio" class="col-12" outlined dense emit-value map-options />
+                </div>
+
+                <!-- Botón de Guardar -->
+                <div class="q-mt-lg row justify-end" style="margin-top: 20px;">
+                  <q-btn label="Guardar Cliente" type="submit" color="primary" icon="save" @click="saveCustomer" />
+                </div>
+              </q-form>
+            </q-card-section>
+          </q-card>
+        </q-dialog>
+      </template>
+    </q-table>
+  </q-page>
   </template>
   
   <script setup>
@@ -280,4 +254,59 @@ const handleOrganizationChange = ()=>{
   fetchMunicipalityOptions();
  });
   </script>
+
+  <style scoped>
+   *{
+    margin: 0%;
+    box-sizing: border-box;
+    font-family: 'NunitSans', sans-serif;
+    font-size: 11px;
+    
+
+  }
+
+  .tittle{
+    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 20px;
+   
+  }
+
+  h4 {
+ 
+    color: #37465a;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 25px;
+  margin-bottom: 10px;
+  font-family: NunitSans, sans-serif;
+  text-align: center;
+  }
+
+  .tabla-header {
+  font-weight: bold;
+  text-transform: uppercase;
+background-color: #007bff;;
+  color: white;
+  padding: 12px;
+  text-align: center;
+} 
+
+.table-header {
+  background-color: #f5f5f5;
+  font-weight: bold;
+  text-align: left;
+  padding: 10px;
+}
+
+/* Mejor organización del formulario */
+.full-width {
+  width: 100%;
+}
+
+
+</style>
     

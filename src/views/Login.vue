@@ -4,7 +4,7 @@
       <div class="banner-component" data-v-ccca2500="true">
         <div data-v-25e250e8="true">
           <div class="banner" data-v-25e250e8="true">
-            <img src="/src/assets/logolr (2).png" alt="Logo"  />
+            <img src="/public/logo.png" alt="Logo"  />
           </div>
         </div>
 
@@ -63,7 +63,6 @@
               <p class="finish-term" data-v-fad7408b="true">Al hacer clic en ingresar, estas aceptando nuestros
                 <a data-v-fad7408b="true" href="#">Términos y condiciones de servicios</a>
                 y estas aceptando nuestra
-                <br data-v-fad7408b="true">
                 <a data-v-fad7408b="true" href="#">Política de privacidad de datos</a>.
               </p>
             </div>
@@ -83,6 +82,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { postData } from '../services/apiClient'
 import { useAuth } from '../store/useAuth'
+
 
 const store = useAuth()
 const router = useRouter()

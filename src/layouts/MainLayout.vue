@@ -4,7 +4,7 @@
         <q-header elevated class="header" v-show="$route.path !== '/' && $route.path !== '/'">
           <q-toolbar>
             <q-btn flat @click="drawer = !drawer" round dense icon="menu" v-if="userName"/>
-            <q-toolbar-title>Factus</q-toolbar-title>
+            <q-toolbar-title>LRFactus</q-toolbar-title>
             
             <q-btn-dropdown  id="dropdown" :label="userName" class="q-py-sm" style="color: white; ">
                 
@@ -29,7 +29,7 @@
         </q-header>
         
   
-        <q-drawer
+        <q-drawer 
         v-show="$route.path !== '/' && $route.path !== '/'"
           v-model="drawer"
           show-if-above
@@ -111,14 +111,18 @@ import { QPageContainer } from 'quasar';
   </script>
   <style>
   .header{
-    background: rgb(0,220,230);
-    background: radial-gradient(circle, rgba(0,220,230,1) 0%, rgba(0,123,240,1) 50%);
+    background-color: #0d6efd;
   }
 
   #dropdown{
     font-size: 10px;
     font-weight: 700;
+    
    
+  }
+
+  .q-drawer{
+    color: #37465a;;
   }
 
   
