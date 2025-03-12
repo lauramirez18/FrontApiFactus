@@ -51,7 +51,7 @@
           <q-card-section>
             <q-form @submit.prevent="submitInvoice">
               <div class="row q-col-gutter-md">
-                <q-input v-model="invoice.numbering_range_id" label="Número de Rango" type="number" class="col-6" outlined />
+               <q-select v-model="invoice.numbering_range_id" :options="rangeOptions" label="Rango de Numeración" class="col-6" outlined emit-value map-options />
                 <q-input v-model="invoice.reference_code" label="Código de Referencia" class="col-6" outlined />
               </div>
   
@@ -59,7 +59,7 @@
   
               <div class="row q-col-gutter-md q-mt-md">
                 <q-input v-model="invoice.payment_form.method" label="Forma de Pago" class="col-6" outlined />
-                <q-input v-model="invoice.payment_form.installments" label="Cuotas" type="number" class="col-6" outlined />
+           
               </div>
   
               <div class="row q-col-gutter-md q-mt-md">
@@ -87,7 +87,7 @@
                 map-options 
                 class="q-mt-md" 
                 outlined
-                @update:model-value="setCustomerDetails"
+                
               />
               <div class="row q-col-gutter-md">
               <q-input v-model="invoice.customer_email" label="Email" class="col-6" outlined disable />
@@ -105,7 +105,7 @@
                 map-options 
                 class="q-mt-md" 
                 outlined
-                @update:model-value="setProductDetails"
+                
               />
               <div class="row q-col-gutter-md">
               <q-input v-model="invoice.product_price" label="Precio" class="col-4" outlined disable />
@@ -130,13 +130,22 @@
   const selectedProductId = ref(null);
 
   const invoice = ref({
-  numbering_range_id: null,
+  numbering_range_id: 8,
   reference_code: "",
   observation: "",
   payment_form: { method: "", installments: 1 },
   payment_due_date: "",
   payment_method_code: "",
-  billing_period: { start_date: "", start_time: "", end_date: "", end_time: "" },
+  billing_period:{
+                /* start_date:factura.value.billing_period.start_date,
+                start_time:factura.value.billing_period.start_time,
+                end_date:factura.value.billing_period.end_date,
+                end_time:factura.value.billing_period.end_time */
+                start_date:"2024-01-10",
+                start_time:"00:00:00",
+                end_date:"2024-02-09",
+                end_time:"23:59:59"
+            },
   customer: null,
   customer_email: "",
   customer_phone: "",
@@ -158,6 +167,7 @@
   
   const customers = ref([]);
   const products = ref([ ]);
+  const rangeOptions = ref([]);
   
   async function getDatafromAPI() {
     try {
@@ -193,6 +203,22 @@
   onMounted(() => {
     getDatafromAPI();
   });
+
+  //endpoints
+
+  const fetchRangesNumber = async () => {
+    try {
+      const response = await getData('/v1/numbering-ranges?filter[id]&filter[document]&filter[resolution_number]&filter[technical_key]&filter[is_active]');
+      if(response.data && Array.isArray(response.data)){
+        rangeOptions.value = response.data.map(item => ({value: item.id, label: item.document}));
+      } else{
+        console.error('❌ Estructura inesperada en la respuesta:', response.data);
+      }
+      
+    } catch (error) {
+      console.error('❌ Error al obtener los rangos:', error);
+    }
+  };
   </script>
 
   <style scoped>

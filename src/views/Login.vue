@@ -4,7 +4,7 @@
       <div class="banner-component" data-v-ccca2500="true">
         <div data-v-25e250e8="true">
           <div class="banner" data-v-25e250e8="true">
-            <img src="/public/logo.png" alt="Logo"  />
+            <img src="/logo.png" alt="Logo"  />
           </div>
         </div>
 
